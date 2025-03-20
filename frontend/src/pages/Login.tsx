@@ -23,10 +23,17 @@ const Login = () => {
         password,
       });
 
+      const token = response.data.token;
+
+      console.log("response in login",response)
+      console.log("token",token)
+
       setIsLoading(false);
       if (response.data.success) {
         // Store the role in localStorage
         localStorage.setItem('role', selectedRole);
+
+        localStorage.setItem("token",token)
 
         if (selectedRole === 'admin') {
           navigate('/admin/dashboard');

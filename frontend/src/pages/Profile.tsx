@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import Header from '@/components/layout/Header';
-import { Input } from '@/components/ui/input'; // Ensure correct import
+import { Input } from '@/components/ui/input';
 
 interface UserData {
   name: string;
@@ -49,9 +49,10 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:8000/h2c/userdata', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Assuming you store the JWT token in localStorage
+            Authorization: `Bearer ${token}`,
           },
         });
         setUserData(response.data.data);
@@ -60,20 +61,17 @@ const Profile: React.FC = () => {
         console.error('Error fetching user data:', error);
       }
     };
-
     fetchUserData();
   }, []);
 
   const handleEditToggle = () => {
     if (isEditing && tempUserData) {
-      // Save changes
       setUserData({ ...tempUserData });
       toast({
         title: "Profile Updated",
         description: "Your profile information has been updated successfully."
       });
     } else if (userData) {
-      // Start editing
       setTempUserData({ ...userData });
     }
     setIsEditing(!isEditing);
@@ -94,14 +92,12 @@ const Profile: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
       <main className="container mx-auto px-4 py-24">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold">My Profile</h1>
             <p className="text-muted-foreground">Manage your profile and view your progress</p>
           </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1 space-y-6">
               <Card>
@@ -149,15 +145,19 @@ const Profile: React.FC = () => {
                   <CardTitle className="text-lg">Subject Progress</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {userData.progress.map((progress) => (
-                    <div key={progress.topicId._id} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">{progress.topicId.name}</span>
-                        <span className="text-sm text-muted-foreground">{progress.completed ? 'Completed' : 'In Progress'}</span>
+                  {userData.progress.length > 0 ? (
+                    userData.progress.map((progress) => (
+                      <div key={progress.topicId._id} className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium">{progress.topicId.name}</span>
+                          <span className="text-sm text-muted-foreground">{progress.completed ? 'Completed' : 'In Progress'}</span>
+                        </div>
+                        <Progress value={progress.completed ? 100 : 50} className="h-2" />
                       </div>
-                      <Progress value={progress.completed ? 100 : 50} className="h-2" />
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p>No progress data available.</p>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -181,7 +181,6 @@ const Profile: React.FC = () => {
                             onChange={handleInputChange}
                           />
                         </div>
-
                         <div className="space-y-2">
                           <label htmlFor="email" className="text-sm font-medium">Email</label>
                           <Input
@@ -210,27 +209,31 @@ const Profile: React.FC = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-4">
-                          {userData.testHistory.map((activity) => (
-                            <div key={activity.testId._id} className="flex items-start gap-4 pb-4 border-b border-border/40 last:border-0 last:pb-0">
-                              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                                <FileText className="h-5 w-5 text-orange-500" />
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <h4 className="font-medium">{activity.topicId.name}</h4>
-                                  <p className="text-sm text-muted-foreground">{new Date(activity.testDate).toLocaleDateString()}</p>
+                          {userData.testHistory.length > 0 ? (
+                            userData.testHistory.map((activity) => (
+                              <div key={activity.testId._id} className="flex items-start gap-4 pb-4 border-b border-border/40 last:border-0 last:pb-0">
+                                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                                  <FileText className="h-5 w-5 text-orange-500" />
                                 </div>
-                                <div className="flex gap-2 mt-1">
-                                  <Badge variant="outline" className="bg-orange-50 text-orange-700 hover:bg-orange-50">
-                                    Quiz
-                                  </Badge>
-                                  <Badge variant="outline">
-                                    Score: {activity.score}
-                                  </Badge>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <h4 className="font-medium">{activity.topicId.name}</h4>
+                                    <p className="text-sm text-muted-foreground">{new Date(activity.testDate).toLocaleDateString()}</p>
+                                  </div>
+                                  <div className="flex gap-2 mt-1">
+                                    <Badge variant="outline" className="bg-orange-50 text-orange-700 hover:bg-orange-50">
+                                      Quiz
+                                    </Badge>
+                                    <Badge variant="outline">
+                                      Score: {activity.score}
+                                    </Badge>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))
+                          ) : (
+                            <p>No recent activity available.</p>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -244,26 +247,30 @@ const Profile: React.FC = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {userData.accuracy.map((accuracy) => (
-                            <Card key={accuracy.topicId._id} className="overflow-hidden">
-                              <CardContent className="p-6">
-                                <div className="flex items-start gap-4">
-                                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                    <Award className="h-8 w-8 text-yellow-500" />
+                          {userData.accuracy.length > 0 ? (
+                            userData.accuracy.map((accuracy) => (
+                              <Card key={accuracy.topicId._id} className="overflow-hidden">
+                                <CardContent className="p-6">
+                                  <div className="flex items-start gap-4">
+                                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                      <Award className="h-8 w-8 text-yellow-500" />
+                                    </div>
+                                    <div>
+                                      <h4 className="font-semibold">{accuracy.topicId.name}</h4>
+                                      <p className="text-sm text-muted-foreground">
+                                        Accuracy: {accuracy.accuracy}%
+                                      </p>
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        Tests Given: {accuracy.totalTestsGiven}
+                                      </p>
+                                    </div>
                                   </div>
-                                  <div>
-                                    <h4 className="font-semibold">{accuracy.topicId.name}</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      Accuracy: {accuracy.accuracy}%
-                                    </p>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      Tests Given: {accuracy.totalTestsGiven}
-                                    </p>
-                                  </div>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))}
+                                </CardContent>
+                              </Card>
+                            ))
+                          ) : (
+                            <p>No achievements available.</p>
+                          )}
                         </div>
                       </CardContent>
                     </Card>

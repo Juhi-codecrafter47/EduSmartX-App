@@ -11,9 +11,9 @@ const { submitTest } = require('../controller/submissionTest');
 const { chatBot } = require('../controller/gemini');
 const { updateProgress, getProgress, removeFromComplete } = require('../controller/completeProgrss');
 const { sendBattleRequest } = require('../controller/createBattle');
-const { auth } = require('../middleware/auth');
 const { generateQuestionPaper } = require('../controller/createQuestionPaper');
 const { getSyllabus } = require('../controller/createSyllabus');
+const {auth}=require('../middleware/auth')
 const router =express.Router();
 
 router.post('/signup',signup);

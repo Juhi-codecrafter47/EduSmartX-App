@@ -149,10 +149,32 @@ exports.getAllUsers = async (req, res) => {
         });
     }
 };
-
 exports.getUserData = async (req, res) => {
     try {
-        const userId = req.user.id; // Assuming you have user authentication and req.user contains the user ID
+        // Extract the token from the request headers
+        const token = req.header("Authorization")?.split(" ")[1];
+
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: "Access denied. No token provided.",
+            });
+        }
+
+        // Verify and decode the token
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRETE); // Ensure JWT_SECRET is correct in .env
+        } catch (err) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid or expired token.",
+            });
+        }
+
+        const userId = decoded.id; // Extract user ID from decoded token
+        console.log("Decoded userId:", userId);
+
         const user = await User.findById(userId)
             .populate('progress.topicId')
             .populate('accuracy.topicId')
@@ -171,6 +193,7 @@ exports.getUserData = async (req, res) => {
             data: user,
         });
     } catch (error) {
+        console.error("Error fetching user data:", error);
         res.status(500).json({
             success: false,
             message: 'Error fetching user data',
