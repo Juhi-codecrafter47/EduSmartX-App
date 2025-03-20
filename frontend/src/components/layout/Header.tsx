@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
@@ -17,6 +16,7 @@ const Header = () => {
     { name: 'Question Papers', path: '/question-papers' },
     { name: 'Quiz', path: '/quiz' },
     { name: 'Chatbot', path: '/chatbot' },
+    { name: 'Planner', path: '/planner' },
   ];
   
   // Handle scroll effect
