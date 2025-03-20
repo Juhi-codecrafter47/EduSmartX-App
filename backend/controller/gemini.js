@@ -16,10 +16,10 @@ const generate = async (question) => {
 };
 
 exports.chatBot = async (req, res) => {
-    const { question } = req.body;
-    if (!question) {
-      return res.status(400).json({ error: "Question is required" });
-    }
-    const result = await generate(question);
-    res.json({ result });
-  };
+  const { question } = req.body;
+  if (!question) {
+    return res.status(400).json({ error: "Question is required" });
+  }
+  const result = await generate(question);
+  res.json({ result });
+};

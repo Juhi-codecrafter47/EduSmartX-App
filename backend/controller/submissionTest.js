@@ -9,7 +9,6 @@ exports.submitTest = async (req, res) => {
     if (!testId || !userResponses || userResponses.length === 0) {
       return res.status(400).json({ success: false, message: "Test ID and responses are required." });
     }
-
     const test = await Test.findById(testId);
     if (!test) return res.status(404).json({ success: false, message: "Test not found." });
     if (test.isCompleted) return res.status(400).json({ success: false, message: "Test already submitted." });

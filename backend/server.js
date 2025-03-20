@@ -25,6 +25,10 @@ app.use(fileuploader({
     tempFileDir:'/tmp'
 }));
 
+router.get("/h2c/auth", (req, res) => {
+    res.json({ success: true, message: "Auth route is working!" });
+});
+
 app.use('/h2c',router);
 
 const PORT=process.env.PORT || 8000;
