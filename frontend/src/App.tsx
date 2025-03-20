@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,7 @@ import QuestionPapers from "./pages/QuestionPapers";
 import Quiz from "./pages/Quiz";
 import Chatbot from "./pages/Chatbot";
 import Login from "./pages/Login";
+import Signup from './pages/SignUp'; // Import the Signup component
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -20,9 +20,9 @@ const queryClient = new QueryClient();
 // Simple admin route guard component
 const AdminRoute = ({ element }: { element: JSX.Element }) => {
   // In a real app, you would check if the user is logged in and is an admin
-  // For demo purposes, we'll just use a simple check 
+  // For demo purposes, we'll just use a simple check
   const isAdmin = localStorage.getItem('role') === 'admin';
-  
+
   return isAdmin ? element : <Navigate to="/login" replace />;
 };
 
@@ -41,15 +41,16 @@ const App = () => {
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} /> {/* Add the Signup route */}
             <Route path="/profile" element={<Profile />} />
-            
-            {/* Admin routes */}
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/students" element={<AdminDashboard />} /> 
-            <Route path="/admin/syllabus" element={<AdminDashboard />} />
-            <Route path="/admin/papers" element={<AdminDashboard />} />
-            <Route path="/admin/settings" element={<AdminDashboard />} />
-            
+
+            {/* Admin routes with guard */}
+            <Route path="/admin/dashboard" element={<AdminRoute element={<AdminDashboard />} />} />
+            <Route path="/admin/students" element={<AdminRoute element={<AdminDashboard />} />} />
+            <Route path="/admin/syllabus" element={<AdminRoute element={<AdminDashboard />} />} />
+            <Route path="/admin/papers" element={<AdminRoute element={<AdminDashboard />} />} />
+            <Route path="/admin/settings" element={<AdminRoute element={<AdminDashboard />} />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

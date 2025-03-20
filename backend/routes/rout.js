@@ -1,5 +1,5 @@
 const express =require('express');
-const { signup, login, getAllUsers } = require('../controller/Auth');
+const { signup, login, getAllUsers, getUserData } = require('../controller/Auth');
 const { createCourse, getCoursedetails } = require('../controller/createCourse');
 const { createSubject, getSubjectDetails } = require('../controller/createSubject');
 const { createChapter } = require('../controller/createChapter');
@@ -13,6 +13,7 @@ const { updateProgress, getProgress, removeFromComplete } = require('../controll
 const { sendBattleRequest } = require('../controller/createBattle');
 const { auth } = require('../middleware/auth');
 const { generateQuestionPaper } = require('../controller/createQuestionPaper');
+const { getSyllabus } = require('../controller/createSyllabus');
 const router =express.Router();
 
 router.post('/signup',signup);
@@ -35,4 +36,6 @@ router.post('/sendRequest',sendBattleRequest);
 router.get('/progress',getProgress);
 router.post('/removecompletetopic',removeFromComplete);
 router.post('/questionPaper/create',generateQuestionPaper);
+router.get('/getSyllabus',getSyllabus);
+router.get('/userdata',getUserData);
 module.exports=router;

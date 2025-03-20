@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import axios from 'axios';
 
-const Login = () => {
+const Signup = () => {
   const [selectedRole, setSelectedRole] = useState<'user' | 'admin' | null>(null);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -18,27 +19,22 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/h2c/login', {
+      const response = await axios.post('http://localhost:8000/h2c/signup', {
+        name,
         email,
         password,
+        role: selectedRole,
       });
 
       setIsLoading(false);
       if (response.data.success) {
-        // Store the role in localStorage
-        localStorage.setItem('role', selectedRole);
-
-        if (selectedRole === 'admin') {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/dashboard');
-        }
+        alert('Signup successful! Please log in.');
+        navigate('/login');
       } else {
-        alert('Login failed. Please check your credentials.');
+        alert('Signup failed. Please try again.');
       }
     } catch (error) {
       setIsLoading(false);
-      console.error('Login error:', error);
       alert('An error occurred. Please try again.');
     }
   };
@@ -93,24 +89,38 @@ const Login = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">
-            {selectedRole === 'admin' ? 'Admin Login' : 'Student Login'}
+            {selectedRole === 'admin' ? 'Admin Signup' : 'Student Signup'}
           </h1>
           <p className="text-muted-foreground">
-            Enter your credentials to continue
+            Enter your details to create an account
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Sign in</CardTitle>
+            <CardTitle>Sign up</CardTitle>
             <CardDescription>
               {selectedRole === 'admin'
-                ? 'Access the admin dashboard to manage content and students.'
-                : 'Access your personalized learning experience.'}
+                ? 'Create an admin account to manage content and students.'
+                : 'Create your personalized learning experience.'}
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-sm font-medium">
+                  Name
+                </label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Your Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="w-full"
+                />
+              </div>
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">
                   Email address
@@ -130,9 +140,6 @@ const Login = () => {
                   <label htmlFor="password" className="text-sm font-medium">
                     Password
                   </label>
-                  <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                    Forgot password?
-                  </Link>
                 </div>
                 <Input
                   id="password"
@@ -149,33 +156,19 @@ const Login = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
+                    Signing up...
                   </>
                 ) : (
-                  'Sign in'
+                  'Sign up'
                 )}
-              </Button>
-
-              <div className="relative my-4">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border/40"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
-                </div>
-              </div>
-
-              <Button variant="outline" className="w-full">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" className="h-4 w-4 mr-2" />
-                Google
               </Button>
             </CardContent>
           </form>
           <CardFooter className="flex items-center justify-center">
             <div className="text-sm text-muted-foreground">
-              Don't have an account?{' '}
-              <Link to="/signup" className="text-primary hover:underline">
-                Sign up
+              Already have an account?{' '}
+              <Link to="/login" className="text-primary hover:underline">
+                Log in
               </Link>
             </div>
           </CardFooter>
@@ -193,4 +186,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
