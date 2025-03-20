@@ -1,3 +1,4 @@
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,13 +13,14 @@ import Chatbot from "./pages/Chatbot";
 import Login from "./pages/Login";
 import Signup from './pages/SignUp'; // Import the Signup component
 import Profile from "./pages/Profile";
+import Planner from "./pages/Planner";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 // Simple admin route guard component
-const AdminRoute = ({ element }: { element: JSX.Element }) => {
+const AdminRoute = ({ element }: { element: React.ReactElement }) => {
   // In a real app, you would check if the user is logged in and is an admin
   // For demo purposes, we'll just use a simple check
   const isAdmin = localStorage.getItem('role') === 'admin';
@@ -40,6 +42,7 @@ const App = () => {
             <Route path="/question-papers" element={<QuestionPapers />} />
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/chatbot" element={<Chatbot />} />
+            <Route path="/planner" element={<Planner />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} /> {/* Add the Signup route */}
             <Route path="/profile" element={<Profile />} />
