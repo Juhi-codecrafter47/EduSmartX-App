@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import axios from 'axios';
 
 const Quiz = () => {
   const navigate = useNavigate();
@@ -300,6 +301,16 @@ const Quiz = () => {
             </div>
           </div>
         );
+
+        const fetchSubjects = async () => {
+          try {
+            const res = await axios.post("http://localhost:8080/")
+            console.log(res.data)
+
+
+          } catch (error) {
+            
+          }}
       
       case 2:
         return (

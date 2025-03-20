@@ -2,7 +2,7 @@ const express =require('express');
 const { signup, login, getAllUsers, getUserData } = require('../controller/Auth');
 const { createCourse, getCoursedetails } = require('../controller/createCourse');
 const { createSubject, getSubjectDetails } = require('../controller/createSubject');
-const { createChapter } = require('../controller/createChapter');
+const { createChapter, getAllChapters } = require('../controller/createChapter');
 const { createTopic, getTotalTopics, getAllTopics } = require('../controller/createTopic');
 const { createQuestionWithImage } = require('../controller/createQuestion');
 const { getQuestionsForTest } = require('../controller/getQuestions');
@@ -38,4 +38,6 @@ router.post('/removecompletetopic',removeFromComplete);
 router.post('/questionPaper/create',generateQuestionPaper);
 router.get('/getSyllabus',getSyllabus);
 router.get('/userdata',getUserData);
+router.get("/getCurrentSelectedChapters",getAllChapter);
+
 module.exports=router;
