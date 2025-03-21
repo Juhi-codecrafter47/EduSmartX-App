@@ -6,7 +6,8 @@ exports.auth = async (req, res, next) => {
         const token =
             req.cookies.token ||
             req.body.token ||
-            req.header("Authorization")?.replace("Bearer ", ""); 
+            req.header("Authorization")?.replace("Bearer ", "") ||
+            (req.headers.authorization || '').replace('Bearer ', '');
 
         if (!token) {
             return res.status(401).json({
@@ -15,7 +16,7 @@ exports.auth = async (req, res, next) => {
             });
         }
 
-        // ✅ Decode token without verifying
+        // Decode token without verifying
         const decodedWithoutVerify = jwt.decode(token);
         console.log("Decoded Token (without verification):", decodedWithoutVerify);
 
@@ -26,13 +27,14 @@ exports.auth = async (req, res, next) => {
             });
         }
 
-        // ✅ Now verify the token
+        // Verify the token
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRETE);
             console.log("Decoded Token (verified):", decoded);
             req.user = decoded;
             next();
         } catch (e) {
+            console.error("Token verification error:", e.message);
             return res.status(401).json({
                 success: false,
                 message: "Token is invalid",
@@ -40,12 +42,14 @@ exports.auth = async (req, res, next) => {
             });
         }
     } catch (e) {
+        console.error("Unexpected error:", e.message);
         return res.status(500).json({
             success: false,
             message: "Something went wrong while validating the token",
         });
     }
 };
+
 
 
 // ✅ Fixed role check: "student" (previously used undefined variable `user`)

@@ -1,8 +1,8 @@
 const express =require('express');
-const { signup, login, getAllUsers } = require('../controller/Auth');
+const { signup, login, getAllUsers, getUserData } = require('../controller/Auth');
 const { createCourse, getCoursedetails } = require('../controller/createCourse');
 const { createSubject, getSubjectDetails } = require('../controller/createSubject');
-const { createChapter } = require('../controller/createChapter');
+const { createChapter, getAllChapters } = require('../controller/createChapter');
 const { createTopic, getTotalTopics, getAllTopics } = require('../controller/createTopic');
 const { createQuestionWithImage } = require('../controller/createQuestion');
 const { getQuestionsForTest } = require('../controller/getQuestions');
@@ -11,8 +11,9 @@ const { submitTest } = require('../controller/submissionTest');
 const { chatBot } = require('../controller/gemini');
 const { updateProgress, getProgress, removeFromComplete } = require('../controller/completeProgrss');
 const { sendBattleRequest } = require('../controller/createBattle');
-const { auth } = require('../middleware/auth');
 const { generateQuestionPaper } = require('../controller/createQuestionPaper');
+const { getSyllabus } = require('../controller/createSyllabus');
+const {auth}=require('../middleware/auth')
 const router =express.Router();
 
 router.post('/signup',signup);
@@ -35,4 +36,8 @@ router.post('/sendRequest',sendBattleRequest);
 router.get('/progress',getProgress);
 router.post('/removecompletetopic',removeFromComplete);
 router.post('/questionPaper/create',generateQuestionPaper);
+router.get('/getSyllabus',getSyllabus);
+router.get('/userdata',getUserData);
+router.get("/getCurrentSelectedChapters",getAllChapter);
+
 module.exports=router;

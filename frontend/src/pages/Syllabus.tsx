@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { BookOpen, CheckCircle, ChevronRight, Search, Filter, BookOpenCheck } from 'lucide-react';
+import { BookOpen, CheckCircle, Search, BookOpenCheck } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -18,320 +16,126 @@ type Topic = {
 };
 
 type Chapter = {
-  chapter: string;
-  completed: number;
-  total: number;
+  chapterName: string;
   topics: Topic[];
 };
 
-type JEESyllabus = {
-  physics: Chapter[];
-  chemistry: Chapter[];
-  mathematics: Chapter[];
+type Subject = {
+  subjectName: string;
+  chapters: Chapter[];
 };
 
-type NEETSyllabus = {
-  physics: Chapter[];
-  chemistry: Chapter[];
-  biology: Chapter[];
+type Course = {
+  courseName: string;
+  subjects: Subject[];
 };
-
-type SyllabusType = JEESyllabus | NEETSyllabus;
 
 const Syllabus = () => {
   const { toast } = useToast();
   const [selectedExam, setSelectedExam] = useState<'JEE' | 'NEET'>('JEE');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string>('physics');
-  const [completedAlert, setCompletedAlert] = useState<{visible: boolean, chapter: string} | null>(null);
-  
-  const jeeSyllabus: JEESyllabus = {
-    physics: [
-      {
-        chapter: "Mechanics",
-        completed: 4,
-        total: 10,
-        topics: [
-          { name: "Units and Dimensions", completed: true },
-          { name: "Kinematics", completed: true },
-          { name: "Newton's Laws of Motion", completed: true },
-          { name: "Work, Energy and Power", completed: true },
-          { name: "Rotational Motion", completed: false },
-          { name: "Gravitation", completed: false },
-          { name: "Properties of Solids and Liquids", completed: false },
-          { name: "Thermodynamics", completed: false },
-          { name: "Kinetic Theory of Gases", completed: false },
-          { name: "Oscillations and Waves", completed: false },
-        ]
-      },
-      {
-        chapter: "Electrodynamics",
-        completed: 2,
-        total: 8,
-        topics: [
-          { name: "Electrostatics", completed: true },
-          { name: "Current Electricity", completed: true },
-          { name: "Magnetic Effects of Current", completed: false },
-          { name: "Magnetism", completed: false },
-          { name: "Electromagnetic Induction", completed: false },
-          { name: "Alternating Current", completed: false },
-          { name: "Electromagnetic Waves", completed: false },
-          { name: "Ray Optics", completed: false },
-        ]
-      },
-      {
-        chapter: "Modern Physics",
-        completed: 1,
-        total: 4,
-        topics: [
-          { name: "Dual Nature of Matter and Radiation", completed: true },
-          { name: "Atoms and Nuclei", completed: false },
-          { name: "Electronic Devices", completed: false },
-          { name: "Communication Systems", completed: false },
-        ]
-      }
-    ],
-    chemistry: [
-      {
-        chapter: "Physical Chemistry",
-        completed: 3,
-        total: 8,
-        topics: [
-          { name: "Basic Concepts", completed: true },
-          { name: "States of Matter", completed: true },
-          { name: "Atomic Structure", completed: true },
-          { name: "Chemical Bonding", completed: false },
-          { name: "Chemical Thermodynamics", completed: false },
-          { name: "Solutions", completed: false },
-          { name: "Equilibrium", completed: false },
-          { name: "Redox Reactions", completed: false },
-        ]
-      },
-      {
-        chapter: "Organic Chemistry",
-        completed: 1,
-        total: 6,
-        topics: [
-          { name: "Basic Principles", completed: true },
-          { name: "Hydrocarbons", completed: false },
-          { name: "Organic Compounds with Functional Groups", completed: false },
-          { name: "Biomolecules", completed: false },
-          { name: "Polymers", completed: false },
-          { name: "Chemistry in Everyday Life", completed: false },
-        ]
-      },
-      {
-        chapter: "Inorganic Chemistry",
-        completed: 2,
-        total: 5,
-        topics: [
-          { name: "Classification of Elements", completed: true },
-          { name: "Hydrogen and s-Block Elements", completed: true },
-          { name: "p-Block Elements", completed: false },
-          { name: "d and f Block Elements", completed: false },
-          { name: "Coordination Compounds", completed: false },
-        ]
-      }
-    ],
-    mathematics: [
-      {
-        chapter: "Algebra",
-        completed: 3,
-        total: 7,
-        topics: [
-          { name: "Sets, Relations and Functions", completed: true },
-          { name: "Complex Numbers", completed: true },
-          { name: "Quadratic Equations", completed: true },
-          { name: "Matrices and Determinants", completed: false },
-          { name: "Permutations and Combinations", completed: false },
-          { name: "Mathematical Induction", completed: false },
-          { name: "Binomial Theorem", completed: false },
-        ]
-      },
-      {
-        chapter: "Calculus",
-        completed: 2,
-        total: 6,
-        topics: [
-          { name: "Limits and Continuity", completed: true },
-          { name: "Differentiation", completed: true },
-          { name: "Applications of Derivatives", completed: false },
-          { name: "Indefinite Integration", completed: false },
-          { name: "Definite Integration", completed: false },
-          { name: "Differential Equations", completed: false },
-        ]
-      },
-      {
-        chapter: "Coordinate Geometry",
-        completed: 1,
-        total: 4,
-        topics: [
-          { name: "Straight Lines", completed: true },
-          { name: "Circles", completed: false },
-          { name: "Conic Sections", completed: false },
-          { name: "3D Geometry", completed: false },
-        ]
-      }
-    ]
-  };
-  
-  const neetSyllabus: NEETSyllabus = {
-    physics: [
-      {
-        chapter: "Mechanics",
-        completed: 3,
-        total: 8,
-        topics: [
-          { name: "Physical World and Measurement", completed: true },
-          { name: "Kinematics", completed: true },
-          { name: "Laws of Motion", completed: true },
-          { name: "Work, Energy and Power", completed: false },
-          { name: "Motion of System of Particles", completed: false },
-          { name: "Gravitation", completed: false },
-          { name: "Properties of Bulk Matter", completed: false },
-          { name: "Thermodynamics", completed: false },
-        ]
-      },
-      {
-        chapter: "Electrodynamics",
-        completed: 1,
-        total: 7,
-        topics: [
-          { name: "Electrostatics", completed: true },
-          { name: "Current Electricity", completed: false },
-          { name: "Magnetic Effects of Current", completed: false },
-          { name: "Magnetism", completed: false },
-          { name: "Electromagnetic Induction", completed: false },
-          { name: "Alternating Current", completed: false },
-          { name: "Electromagnetic Waves", completed: false },
-        ]
-      }
-    ],
-    chemistry: [
-      {
-        chapter: "Physical Chemistry",
-        completed: 2,
-        total: 7,
-        topics: [
-          { name: "Some Basic Concepts", completed: true },
-          { name: "States of Matter", completed: true },
-          { name: "Atomic Structure", completed: false },
-          { name: "Chemical Bonding", completed: false },
-          { name: "Chemical Thermodynamics", completed: false },
-          { name: "Solutions", completed: false },
-          { name: "Equilibrium", completed: false },
-        ]
-      },
-      {
-        chapter: "Organic Chemistry",
-        completed: 1,
-        total: 5,
-        topics: [
-          { name: "Basic Principles", completed: true },
-          { name: "Hydrocarbons", completed: false },
-          { name: "Organic Compounds with Functional Groups", completed: false },
-          { name: "Biomolecules", completed: false },
-          { name: "Chemistry in Everyday Life", completed: false },
-        ]
-      }
-    ],
-    biology: [
-      {
-        chapter: "Botany",
-        completed: 3,
-        total: 8,
-        topics: [
-          { name: "Diversity in Living World", completed: true },
-          { name: "Cell Structure and Function", completed: true },
-          { name: "Plant Physiology", completed: true },
-          { name: "Reproduction", completed: false },
-          { name: "Genetics and Evolution", completed: false },
-          { name: "Biology and Human Welfare", completed: false },
-          { name: "Biotechnology", completed: false },
-          { name: "Ecology", completed: false },
-        ]
-      },
-      {
-        chapter: "Zoology",
-        completed: 2,
-        total: 7,
-        topics: [
-          { name: "Diversity in Living World", completed: true },
-          { name: "Structural Organization", completed: true },
-          { name: "Human Physiology", completed: false },
-          { name: "Reproduction", completed: false },
-          { name: "Genetics and Evolution", completed: false },
-          { name: "Biology and Human Welfare", completed: false },
-          { name: "Biotechnology", completed: false },
-        ]
-      }
-    ]
-  };
-  
-  const [syllabus, setSyllabus] = useState<SyllabusType>(selectedExam === 'JEE' ? jeeSyllabus : neetSyllabus);
-  
+  const [completedAlert, setCompletedAlert] = useState<{ visible: boolean, chapter: string } | null>(null);
+  const [syllabus, setSyllabus] = useState<Course[] | null>(null);
+  const [userId] = useState('your-user-id'); // Replace with actual user ID
+
   useEffect(() => {
-    setSyllabus(selectedExam === 'JEE' ? jeeSyllabus : neetSyllabus);
-    setSelectedSubject('physics');
-  }, [selectedExam]);
-  
-  const calculateProgress = (subject: any) => {
+    const fetchSyllabus = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/h2c/getSyllabus');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+
+        console.log("Fetched Syllabus Data:", JSON.stringify(data, null, 2)); // Debugging
+
+        setSyllabus(data.data);
+      } catch (error) {
+        console.error('Error fetching syllabus:', error);
+      }
+    };
+
+    fetchSyllabus();
+  }, []);
+
+  const calculateProgress = (subject: Subject) => {
     let totalTopics = 0;
     let completedTopics = 0;
-    
-    subject.forEach((chapter: any) => {
+
+    subject.chapters.forEach((chapter: Chapter) => {
       totalTopics += chapter.topics.length;
-      completedTopics += chapter.topics.filter((topic: any) => topic.completed).length;
+      completedTopics += chapter.topics.filter((topic: Topic) => topic.completed).length;
     });
-    
+
     return totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
   };
-  
-  const toggleTopicCompletion = (chapterIndex: number, topicIndex: number) => {
+
+  const toggleTopicCompletion = (subjectIndex: number, chapterIndex: number, topicIndex: number) => {
+    if (!syllabus) return;
+
     const updatedSyllabus = JSON.parse(JSON.stringify(syllabus));
-    
-    const subject = updatedSyllabus[selectedSubject][chapterIndex];
-    const topic = subject.topics[topicIndex];
+    const subject = updatedSyllabus[0].subjects[subjectIndex];
+    const chapter = subject.chapters[chapterIndex];
+    const topic = chapter.topics[topicIndex];
     topic.completed = !topic.completed;
-    
-    subject.completed = subject.topics.filter((t: any) => t.completed).length;
-    
-    if (subject.completed === subject.total) {
+
+    // If chapter is fully completed, show alert
+    if (chapter.topics.every(t => t.completed)) {
       setCompletedAlert({
         visible: true,
-        chapter: subject.chapter
+        chapter: chapter.chapterName
       });
-      
+
       toast({
         title: "Chapter Completed!",
-        description: `You've completed all topics in ${subject.chapter}`,
+        description: `You've completed all topics in ${chapter.chapterName}`,
         variant: "default",
       });
-      
+
       setTimeout(() => {
         setCompletedAlert(null);
       }, 5000);
     }
-    
-    setSyllabus(updatedSyllabus);
-  };
-  
-  const filteredChapters = syllabus[selectedSubject as keyof typeof syllabus].filter((chapter: any) => {
-    const matchesChapter = chapter.chapter.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTopic = chapter.topics.some((topic: any) => 
-      topic.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    return matchesChapter || matchesTopic;
-  });
 
-  const isJEESyllabus = (syllabus: SyllabusType): syllabus is JEESyllabus => {
-    return 'mathematics' in syllabus;
+    setSyllabus(updatedSyllabus);
+
+    fetch('http://localhost:8000/h2c/completedtopic', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, topicId: topic.name, completed: topic.completed }),
+    }).catch(error => console.error('Error updating progress:', error));
   };
-  
+
+  const filteredChapters = syllabus?.[0]?.subjects.find(subject => subject.subjectName.toLowerCase() === selectedSubject.toLowerCase())
+    ?.chapters.filter((chapter: Chapter) => {
+      const matchesChapter = chapter.chapterName?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Ensure chapter.topics exists before calling .some()
+      const matchesTopic = chapter.topics?.some((topic: Topic) =>
+        topic.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      ) ?? false;
+
+      return matchesChapter || matchesTopic;
+    }) || [];
+
+
+  // const filteredChapters = syllabus?.[0]?.subjects
+  // .find(subject => subject.subjectName.toLowerCase() === selectedSubject.toLowerCase())
+  // ?.chapters.filter((chapter) => {
+  //   const matchesChapter = chapter.chapterName?.toLowerCase().includes(searchQuery.toLowerCase());
+
+  //   // Ensure topics exist and match searchQuery
+  //   const matchesTopic = chapter.topics?.some((topic) =>
+  //     topic.toLowerCase().includes(searchQuery.toLowerCase())
+  //   ) ?? false;
+
+  //   return matchesChapter || matchesTopic;
+  // }) || [];
+
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container mx-auto px-4 py-24">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -339,9 +143,9 @@ const Syllabus = () => {
               <h1 className="text-3xl font-bold">Syllabus</h1>
               <p className="text-muted-foreground">Track your progress through the complete syllabus</p>
             </div>
-            
+
             <div className="flex gap-2">
-              <Badge 
+              <Badge
                 onClick={() => setSelectedExam('JEE')}
                 className={cn(
                   "px-4 py-2 text-sm cursor-pointer transition-colors hover:bg-primary/20",
@@ -350,7 +154,7 @@ const Syllabus = () => {
               >
                 JEE
               </Badge>
-              <Badge 
+              <Badge
                 onClick={() => setSelectedExam('NEET')}
                 className={cn(
                   "px-4 py-2 text-sm cursor-pointer transition-colors hover:bg-primary/20",
@@ -361,7 +165,7 @@ const Syllabus = () => {
               </Badge>
             </div>
           </div>
-          
+
           {completedAlert && (
             <Alert className="mb-6" variant="success">
               <CheckCircle className="h-4 w-4" />
@@ -371,63 +175,27 @@ const Syllabus = () => {
               </AlertDescription>
             </Alert>
           )}
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className={cn("cursor-pointer transition-all duration-200", 
-              selectedSubject === 'physics' ? "border-primary shadow-md" : "")}>
-              <CardContent className="p-6" onClick={() => setSelectedSubject('physics')}>
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-semibold">Physics</h3>
-                  <Badge variant={selectedSubject === 'physics' ? "success" : "default"}>
-                    {calculateProgress(syllabus.physics)}% Complete
-                  </Badge>
-                </div>
-                <Progress value={calculateProgress(syllabus.physics)} className="h-2" />
-              </CardContent>
-            </Card>
-            
-            <Card className={cn("cursor-pointer transition-all duration-200", 
-              selectedSubject === 'chemistry' ? "border-primary shadow-md" : "")}>
-              <CardContent className="p-6" onClick={() => setSelectedSubject('chemistry')}>
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-semibold">Chemistry</h3>
-                  <Badge variant={selectedSubject === 'chemistry' ? "success" : "default"}>
-                    {calculateProgress(syllabus.chemistry)}% Complete
-                  </Badge>
-                </div>
-                <Progress value={calculateProgress(syllabus.chemistry)} className="h-2" />
-              </CardContent>
-            </Card>
-            
-            {isJEESyllabus(syllabus) ? (
-              <Card className={cn("cursor-pointer transition-all duration-200", 
-                selectedSubject === 'mathematics' ? "border-primary shadow-md" : "")}>
-                <CardContent className="p-6" onClick={() => setSelectedSubject('mathematics')}>
+            {syllabus?.[0]?.subjects.map((subject, subjectIndex) => (
+              <Card
+                key={subject.subjectName}
+                className={cn("cursor-pointer transition-all duration-200",
+                  selectedSubject === subject.subjectName ? "border-primary shadow-md" : "")}
+              >
+                <CardContent className="p-6" onClick={() => setSelectedSubject(subject.subjectName)}>
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-semibold">Mathematics</h3>
-                    <Badge variant={selectedSubject === 'mathematics' ? "success" : "default"}>
-                      {calculateProgress(syllabus.mathematics)}% Complete
+                    <h3 className="text-lg font-semibold">{subject.subjectName}</h3>
+                    <Badge variant={selectedSubject === subject.subjectName ? "success" : "default"}>
+                      {calculateProgress(subject)}% Complete
                     </Badge>
                   </div>
-                  <Progress value={calculateProgress(syllabus.mathematics)} className="h-2" />
+                  <Progress value={calculateProgress(subject)} className="h-2" />
                 </CardContent>
               </Card>
-            ) : (
-              <Card className={cn("cursor-pointer transition-all duration-200", 
-                selectedSubject === 'biology' ? "border-primary shadow-md" : "")}>
-                <CardContent className="p-6" onClick={() => setSelectedSubject('biology')}>
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-semibold">Biology</h3>
-                    <Badge variant={selectedSubject === 'biology' ? "success" : "default"}>
-                      {calculateProgress((syllabus as NEETSyllabus).biology)}% Complete
-                    </Badge>
-                  </div>
-                  <Progress value={calculateProgress((syllabus as NEETSyllabus).biology)} className="h-2" />
-                </CardContent>
-              </Card>
-            )}
+            ))}
           </div>
-          
+
           <div className="mb-6 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -437,57 +205,83 @@ const Syllabus = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          
+
           <div className="space-y-6">
-            {filteredChapters.map((chapter: any, chapterIndex: number) => (
-              <Card key={chapter.chapter} className="overflow-hidden">
-                <div className="p-6 bg-muted/30">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-primary" />
-                      <h3 className="text-lg font-semibold">{chapter.chapter}</h3>
-                    </div>
-                    <Badge variant={chapter.completed === chapter.total ? "success" : "default"}>
-                      {chapter.completed}/{chapter.total} topics
-                    </Badge>
-                  </div>
-                  <Progress value={(chapter.completed / chapter.total) * 100} className="h-2 mt-4" />
-                </div>
-                
-                <div className="divide-y divide-border/40">
-                  {chapter.topics.map((topic: any, topicIndex: number) => (
-                    <div 
-                      key={topic.name}
-                      className={cn(
-                        "p-4 flex items-center justify-between transition-colors",
-                        topic.completed ? "bg-success/5" : ""
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Checkbox 
-                          id={`topic-${chapterIndex}-${topicIndex}`}
-                          checked={topic.completed}
-                          onCheckedChange={() => toggleTopicCompletion(chapterIndex, topicIndex)}
-                        />
-                        <label 
-                          htmlFor={`topic-${chapterIndex}-${topicIndex}`}
-                          className={cn(
-                            "cursor-pointer",
-                            topic.completed ? "line-through text-muted-foreground" : ""
-                          )}
-                        >
-                          {topic.name}
-                        </label>
-                      </div>
-                      {topic.completed && (
-                        <CheckCircle className="h-4 w-4 text-success" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            ))}
-            
+          {filteredChapters.map((chapter, chapterIndex) => {
+  const subjectIndex = syllabus![0].subjects.findIndex(
+    (subject) => subject.subjectName === selectedSubject
+  );
+  
+  // Convert string topics into objects with a `completed` field
+  const topics = (chapter.topics || []).map((topic) =>
+    typeof topic === "string" ? { name: topic, completed: false } : topic
+  );
+
+  return (
+    <Card
+      key={`${selectedSubject}-${chapterIndex}-${chapter.chapterName}`}
+      className="overflow-hidden"
+    >
+      <div className="p-6 bg-muted/30">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">{chapter.chapterName}</h3>
+          </div>
+          <Badge
+            variant={topics.length > 0 && topics.every((t) => t.completed) ? "success" : "default"}
+          >
+            {topics.filter((t) => t.completed).length}/{topics.length} topics
+          </Badge>
+        </div>
+        <Progress
+          value={topics.length > 0 ? (topics.filter((t) => t.completed).length / topics.length) * 100 : 0}
+          className="h-2 mt-4"
+        />
+      </div>
+
+      <div className="divide-y divide-border/40">
+        {topics.length > 0 ? (
+          topics.map((topic, topicIndex) => (
+            <div
+              key={`${chapter.chapterName}-${chapterIndex}-${topicIndex}-${topic.name}`}
+              className={cn(
+                "p-4 flex items-center justify-between transition-colors",
+                topic.completed ? "bg-success/5" : ""
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id={`topic-${chapterIndex}-${topicIndex}`}
+                  checked={topic.completed}
+                  onCheckedChange={() =>
+                    toggleTopicCompletion(subjectIndex, chapterIndex, topicIndex)
+                  }
+                />
+                <label
+                  htmlFor={`topic-${chapterIndex}-${topicIndex}`}
+                  className={cn(
+                    "cursor-pointer",
+                    topic.completed ? "line-through text-muted-foreground" : ""
+                  )}
+                >
+                  {topic.name}
+                </label>
+              </div>
+              {topic.completed && <CheckCircle className="h-4 w-4 text-success" />}
+            </div>
+          ))
+        ) : (
+          <div className="p-4 text-muted-foreground text-center">
+            No topics available
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+})}
+
+
             {filteredChapters.length === 0 && (
               <div className="text-center py-12">
                 <BookOpenCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />

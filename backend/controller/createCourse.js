@@ -29,7 +29,7 @@ exports.createCourse = async (req, res) => {
 
 exports.getCoursedetails = async (req, res) => {
     try {
-        const {id} = req.body;
+        const {id} = req.body;  
 
         if (!id) {
             return res.status(400).json({
