@@ -1,13 +1,8 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Image, Loader2, Bot, User, ThumbsUp, ThumbsDown, Copy, MoreVertical } from 'lucide-react';
+import { Send, Image, Loader2, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
@@ -43,7 +38,7 @@ const Chatbot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputValue.trim() === '') return;
 
     const newUserMessage: Message = {
@@ -53,120 +48,51 @@ const Chatbot = () => {
       timestamp: new Date(),
     };
 
-    setMessages([...messages, newUserMessage]);
+    setMessages(prev => [...prev, newUserMessage]);
     setInputValue('');
-
-    simulateBotResponse(inputValue);
-  };
-
-  const simulateBotResponse = (userInput: string) => {
     setIsLoading(true);
 
-    setTimeout(() => {
-      let botResponse = '';
+    try {
+      const response = await fetch('http://127.0.0.1:51556/solve_question', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify({ question: inputValue }),
+      });
 
-      if (userInput.toLowerCase().includes('newton') || userInput.toLowerCase().includes('law of motion')) {
-        botResponse = `
-          <h3>Newton's Laws of Motion</h3>
-          
-          <p>Newton's three laws of motion can be summarized as:</p>
-          
-          <ol>
-            <li><strong>First Law (Law of Inertia):</strong> An object at rest stays at rest, and an object in motion stays in motion with the same speed and direction unless acted upon by an unbalanced force.</li>
-            <li><strong>Second Law:</strong> The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass. F = ma</li>
-            <li><strong>Third Law:</strong> For every action, there is an equal and opposite reaction.</li>
-          </ol>
-          
-          <p>These laws form the foundation of classical mechanics and are crucial for solving problems in both JEE and NEET physics sections.</p>
-          
-          <p>Would you like me to provide some example problems applying these laws?</p>
-        `;
-      } else if (userInput.toLowerCase().includes('acid') && userInput.toLowerCase().includes('base')) {
-        botResponse = `
-          <h3>Acid-Base Concepts</h3>
-          
-          <p>There are three main theories that define acids and bases:</p>
-          
-          <ul>
-            <li><strong>Arrhenius Theory:</strong> Acids produce H+ ions in water, bases produce OH- ions in water.</li>
-            <li><strong>Brønsted-Lowry Theory:</strong> Acids are proton (H+) donors, bases are proton acceptors.</li>
-            <li><strong>Lewis Theory:</strong> Acids are electron pair acceptors, bases are electron pair donors.</li>
-          </ul>
-          
-          <p>pH is a measure of acidity or alkalinity, ranging from 0-14:</p>
-          <ul>
-            <li>pH < 7: Acidic</li>
-            <li>pH = 7: Neutral</li>
-            <li>pH > 7: Basic/Alkaline</li>
-          </ul>
-          
-          <p>Remember, pH = -log[H+]</p>
-        `;
-      } else if (userInput.toLowerCase().includes('calculus') || userInput.toLowerCase().includes('derivative') || userInput.toLowerCase().includes('integration')) {
-        botResponse = `
-          <h3>Calculus Basics</h3>
-          
-          <p>Calculus has two main branches:</p>
-          
-          <ul>
-            <li><strong>Differential Calculus:</strong> Involves finding rates of change (derivatives)</li>
-            <li><strong>Integral Calculus:</strong> Involves finding areas under curves (integrals)</li>
-          </ul>
-          
-          <p>Key formulas to remember:</p>
-          
-          <p><strong>Basic Derivatives:</strong></p>
-          <ul>
-            <li>d/dx(xⁿ) = n·xⁿ⁻¹</li>
-            <li>d/dx(sin x) = cos x</li>
-            <li>d/dx(cos x) = -sin x</li>
-            <li>d/dx(eˣ) = eˣ</li>
-            <li>d/dx(ln x) = 1/x</li>
-          </ul>
-          
-          <p><strong>Basic Integrals:</strong></p>
-          <ul>
-            <li>∫xⁿ dx = xⁿ⁺¹/(n+1) + C (for n ≠ -1)</li>
-            <li>∫sin x dx = -cos x + C</li>
-            <li>∫cos x dx = sin x + C</li>
-            <li>∫eˣ dx = eˣ + C</li>
-            <li>∫(1/x) dx = ln|x| + C</li>
-          </ul>
-        `;
-      } else if (userInput.toLowerCase().includes('photosynth') || userInput.toLowerCase().includes('plant')) {
-        botResponse = `
-          <h3>Photosynthesis</h3>
-          
-          <p>Photosynthesis is the process by which green plants, algae, and some bacteria convert light energy into chemical energy:</p>
-          
-          <p>6CO₂ + 6H₂O + Light Energy → C₆H₁₂O₆ + 6O₂</p>
-          
-          <p>The process occurs in two main stages:</p>
-          
-          <ol>
-            <li><strong>Light-dependent reactions:</strong> Occur in the thylakoid membrane and convert light energy into ATP and NADPH. Water is split, releasing oxygen.</li>
-            <li><strong>Calvin cycle (Light-independent reactions):</strong> Uses ATP and NADPH from the light reactions to convert CO₂ into glucose. Takes place in the stroma.</li>
-          </ol>
-          
-          <p>Chlorophyll a and b are the primary photosynthetic pigments that absorb light energy, predominantly blue and red wavelengths.</p>
-        `;
-      } else {
-        botResponse = "I'm here to help with your JEE/NEET preparation. You can ask me questions about Physics, Chemistry, Mathematics, or Biology concepts. You can also upload images of problems you're struggling with, and I'll help you solve them. What subject or topic would you like to explore?";
-      }
+      const data = await response.json();
 
       const newBotMessage: Message = {
         id: String(Date.now() + 1),
-        content: botResponse,
+        content: data.solution || 'Sorry, I couldn’t find a solution for that.',
         sender: 'bot',
         timestamp: new Date(),
       };
 
-      setMessages(prevMessages => [...prevMessages, newBotMessage]);
+      setMessages(prev => [...prev, newBotMessage]);
+    } catch (error) {
+      const errorBotMessage: Message = {
+        id: String(Date.now() + 1),
+        content: '⚠️ There was an error contacting the server. Please try again later.',
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorBotMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -179,191 +105,127 @@ const Chatbot = () => {
       timestamp: new Date(),
     };
 
-    setMessages([...messages, newUserMessage]);
+    setMessages(prev => [...prev, newUserMessage]);
+    setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      // Create a FormData object to send the file
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Send the image to the API
+      const response = await fetch('http://127.0.0.1:8081/solve_question_from_image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      // Display the extracted question
+      if (data.extracted_text) {
+        const extractedTextMessage: Message = {
+          id: String(Date.now() + 1),
+          content: `📝 Extracted question: ${data.extracted_text}`,
+          sender: 'bot',
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, extractedTextMessage]);
+      }
+
+      // Display the solution
       const newBotMessage: Message = {
-        id: String(Date.now() + 1),
-        content: "I've analyzed your uploaded image. It appears to contain a problem related to kinematics. Would you like me to explain how to approach this type of problem?",
+        id: String(Date.now() + 2),
+        content: data.solution || 'Sorry, I couldn\'t solve this problem.',
         sender: 'bot',
         timestamp: new Date(),
       };
 
-      setMessages(prevMessages => [...prevMessages, newBotMessage]);
-    }, 2000);
-  };
-
-  const formatMessageContent = (content: string) => {
-    return (
-      <div dangerouslySetInnerHTML={{ __html: content }}></div>
-    );
+      setMessages(prev => [...prev, newBotMessage]);
+    } catch (error) {
+      console.error('Error processing image:', error);
+      const errorBotMessage: Message = {
+        id: String(Date.now() + 1),
+        content: '⚠️ There was an error processing your image. Please try again or type your question instead.',
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorBotMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
-      
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 pt-24 pb-12">
-        <div className="flex-1 flex flex-col h-[calc(100vh-12rem)] shadow-lg rounded-xl border border-border overflow-hidden bg-white">
-          <div className="p-4 border-b border-border/40 flex justify-between items-center bg-muted/20">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                <Bot size={20} />
-              </div>
-              <div>
-                <h2 className="font-semibold">AI Study Assistant</h2>
-                <p className="text-xs text-muted-foreground">Online and ready to help</p>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon">
-              <MoreVertical size={20} />
-            </Button>
-          </div>
-          
+
+      <main className="flex-1 max-w-4xl mx-auto w-full px-4 md:px-8 pt-24 pb-12">
+        <div className="flex flex-col h-[calc(100vh-12rem)] border rounded-lg shadow-lg bg-white overflow-hidden">
+          {/* Chat Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => (
-              <div 
-                key={message.id}
-                className={cn(
-                  "flex gap-3 max-w-[90%]",
-                  message.sender === 'user' ? "ml-auto" : ""
-                )}
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                {message.sender === 'bot' && (
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center text-primary mt-1">
-                    <Bot size={16} />
-                  </div>
-                )}
-                
-                <div 
-                  className={cn(
-                    "p-3 rounded-lg",
-                    message.sender === 'user'
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                <div className="flex items-start space-x-2 max-w-lg">
+                  {msg.sender === 'bot' && (
+                    <Avatar>
+                      <AvatarFallback><Bot className="w-4 h-4" /></AvatarFallback>
+                    </Avatar>
                   )}
-                >
-                  {message.isImage && message.imageUrl ? (
-                    <div className="mb-2">
-                      <img 
-                        src={message.imageUrl} 
-                        alt="Uploaded" 
-                        className="max-w-xs rounded-md"
-                      />
-                    </div>
-                  ) : null}
-                  
-                  <div className={cn(
-                    "prose prose-sm max-w-none",
-                    message.sender === 'user' && "prose-invert"
-                  )}>
-                    {formatMessageContent(message.content)}
+                  <div className={`p-3 rounded-lg text-sm whitespace-pre-wrap ${msg.sender === 'user' ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                    {msg.isImage ? (
+                      <img src={msg.imageUrl} alt="uploaded" className="max-w-[200px] rounded-md" />
+                    ) : (
+                      msg.content
+                    )}
                   </div>
-                  
-                  {message.sender === 'bot' && (
-                    <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                      <button className="hover:text-foreground transition-colors">
-                        <ThumbsUp size={14} />
-                      </button>
-                      <button className="hover:text-foreground transition-colors">
-                        <ThumbsDown size={14} />
-                      </button>
-                      <button className="hover:text-foreground transition-colors ml-auto">
-                        <Copy size={14} />
-                      </button>
-                    </div>
-                  )}
                 </div>
-                
-                {message.sender === 'user' && (
-                  <div className="w-8 h-8 rounded-full bg-secondary flex-shrink-0 flex items-center justify-center text-foreground mt-1">
-                    <User size={16} />
-                  </div>
-                )}
               </div>
             ))}
-            
             {isLoading && (
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center text-primary mt-1">
-                  <Bot size={16} />
-                </div>
-                <div className="p-3 rounded-lg bg-muted max-w-[90%]">
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              <div className="flex justify-start">
+                <div className="flex items-center space-x-2 p-3 text-sm bg-gray-100 rounded-lg">
+                  <Loader2 className="animate-spin w-4 h-4" />
+                  <span>Thinking...</span>
                 </div>
               </div>
             )}
-            
             <div ref={messagesEndRef} />
           </div>
-          
-          <div className="p-4 border-t border-border/40 bg-muted/20">
-            <div className="flex gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      className="flex-shrink-0"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <Image size={18} />
-                      <input 
-                        type="file" 
-                        ref={fileInputRef}
-                        accept="image/*" 
-                        className="hidden"
-                        onChange={handleFileUpload}
-                      />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    Upload an image of a problem
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask something about JEE/NEET..."
-                  className="w-full py-2 px-4 pr-10 rounded-lg border border-border focus:border-primary focus:ring-primary outline-none transition-colors bg-background"
-                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                />
-              </div>
-              
-              <Button 
-                variant="default" 
-                size="icon"
-                className="flex-shrink-0"
-                onClick={handleSendMessage}
-                disabled={inputValue.trim() === ''}
-              >
-                <Send size={18} />
-              </Button>
-            </div>
-            
-            <div className="mt-2 flex flex-wrap gap-1">
-              <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors">
-                Newton's Laws
-              </Badge>
-              <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors">
-                Acid-Base
-              </Badge>
-              <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors">
-                Calculus
-              </Badge>
-              <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors">
-                Photosynthesis
-              </Badge>
-            </div>
+
+          {/* Input Section */}
+          <div className="border-t p-4 bg-muted flex items-center space-x-2">
+            <Textarea
+              className="flex-1 resize-none"
+              rows={1}
+              placeholder="Ask your JEE/NEET question here..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              title="Upload Image"
+            >
+              <Image className="w-4 h-4" />
+            </Button>
+            <Button onClick={handleSendMessage} disabled={isLoading}>
+              <Send className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );
