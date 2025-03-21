@@ -38,6 +38,6 @@ router.post('/removecompletetopic',removeFromComplete);
 router.post('/questionPaper/create',generateQuestionPaper);
 router.get('/getSyllabus',getSyllabus);
 router.get('/userdata',getUserData);
-router.get("/getCurrentSelectedChapters",getAllChapter);
+// router.get("/getCurrentSelectedChapters",getAllChapter);
 
 module.exports=router;

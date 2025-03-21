@@ -53,7 +53,7 @@ const Chatbot = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:51556/solve_question', {
+      const response = await fetch('http://127.0.0.1:8000/solve_question', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ const Chatbot = () => {
       formData.append('file', file);
 
       // Send the image to the API
-      const response = await fetch('http://127.0.0.1:8081/solve_question_from_image', {
+      const response = await fetch('http://127.0.0.1:8000/solve_question_from_image', {
         method: 'POST',
         body: formData,
       });

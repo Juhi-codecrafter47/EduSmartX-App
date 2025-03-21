@@ -40,7 +40,7 @@ const Index = () => {
             <div className="flex flex-col items-center space-y-4 text-center">
               <motion.div variants={fadeIn} className="space-y-2">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none">
-                  Welcome to EduPrep
+                  Welcome to EduSmartX
                 </h1>
                 <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
                   Your personalized learning platform for exam preparation and academic success.
@@ -80,7 +80,7 @@ const Index = () => {
                 Everything you need to excel in your studies
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                EduPrep provides a comprehensive learning experience with cutting-edge features
+                EduSmartX provides a comprehensive learning experience with cutting-edge features
               </p>
             </motion.div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -164,7 +164,7 @@ const Index = () => {
       <footer className="w-full border-t bg-white py-6">
         <div className="container flex flex-col items-center justify-center gap-4 px-4 md:px-6 md:flex-row">
           <p className="text-center text-sm text-muted-foreground md:text-left">
-            © 2024 EduPrep. All rights reserved.
+            © 2024 EduSmartX. All rights reserved.
           </p>
           <div className="flex gap-4">
             <Link className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline" to="#">

@@ -16,7 +16,7 @@ const Footer = () => {
               <span className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
                 E
               </span>
-              <span>EduPrep</span>
+              <span>EduSmartX</span>
             </Link>
             <p className="text-muted-foreground text-sm">
               An advanced learning platform designed for JEE and NEET aspirants.
